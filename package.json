@@ -1,6 +1,6 @@
 {
   "name": "esp32part",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Partition lib for ESP32.",
   "keywords": [],
   "homepage": "https://github.com/IUnknown68/esp32part",
@@ -33,7 +33,11 @@
     "lint": "eslint ./",
     "lint:fix": "eslint --fix ./",
     "test": "jest",
-    "build": "rollup -c rollup.config.mjs"
+    "build": "rollup -c rollup.config.mjs",
+    "deploy:patch": "./deploy.sh patch",
+    "deploy:minor": "./deploy.sh minor",
+    "deploy:major": "./deploy.sh major",
+    "deploy": "./deploy.sh patch"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
