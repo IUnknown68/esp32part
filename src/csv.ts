@@ -84,8 +84,10 @@ export function csvRowToPartition(line : string) : PartitionRecord | null {
     return null;
   }
 
-  const data = line.split(/\s*,\s*/);
-  if (data.length === 1 && !data[0].trim()) {
+  const data = line
+    .split(/\s*,\s*/)
+    .map((value) => value.trim());
+  if (data.length === 1 && !data[0]) {
     // empty line, just ignore
     return null;
   }
@@ -99,16 +101,16 @@ export function csvRowToPartition(line : string) : PartitionRecord | null {
     ? parseSubtypeApp(data[2])
     : parseSubtypeData(data[2]);
 
-  const flagStr = data[5].trim();
-  const flags = flagStr
-    ? flagStr.split(/:/).map(parseFlag)
+  const flags = data[5]
+    ? data[5].split(/:/).map(parseFlag)
     : [];
 
   return {
     name: data[0],
     type,
     subType,
-    offset: parseNumber(data[3]),
+    // offset can be 0, PartitionTable will set it.
+    offset: data[3] ? parseNumber(data[3]) : 0,
     size: parseNumber(data[4]),
     flags,
   };

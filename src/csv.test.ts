@@ -176,6 +176,20 @@ describe('csvRowToPartition', () => {
       const result = csvRowToPartition(VALID_ROW_WO_FLAGS);
       expect(result).toContainAllEntries(VALID_ROW_RESULT_WO_FLAGS);
     });
+    it('the row contains valid data, but no offset', () => {
+      const VALID_ROW_WO_FLAGS = 'nvs,      data, nvs, ,  0x5000, ';
+      const VALID_ROW_RESULT_WO_FLAGS = [
+        ['name', 'nvs'],
+        ['type', PartitionType.data],
+        ['subType', PartitionSubTypeData.nvs],
+        ['offset', 0],
+        ['size', 0x5000],
+        ['flags', []],
+      ];
+
+      const result = csvRowToPartition(VALID_ROW_WO_FLAGS);
+      expect(result).toContainAllEntries(VALID_ROW_RESULT_WO_FLAGS);
+    });
   });
 });
 

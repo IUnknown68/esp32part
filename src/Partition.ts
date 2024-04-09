@@ -99,6 +99,10 @@ class Partition {
       this.record.flags.splice(index, 1);
     }
   }
+
+  assign(record : PartitionRecord) : void {
+    Object.assign(this.record, record);
+  }
 }
 
 export default Partition;

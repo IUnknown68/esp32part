@@ -1,5 +1,3 @@
-// For aligning the range strings
-/* eslint-disable no-multi-spaces */
 import {
   overlaps,
   isContainedIn,
@@ -10,7 +8,7 @@ function minIndex(a : number, b : number) : number {
   if (a === -1 && b === -1) {
     throw new Error('Missing rangeStart');
   }
-  // Well...
+  // Oh c'mon!
   // eslint-disable-next-line no-nested-ternary
   return (b === -1)
     ? a
@@ -25,7 +23,7 @@ function rangeStart(c : string, str : string) : number {
 }
 
 function rangeEnd(c : string, str : string) : number {
-  // No problem with -1 here, since this uses max().
+  // No problem with -1 here, since we use max().
   return Math.max(str.lastIndexOf(c), str.lastIndexOf('█'));
 }
 
@@ -39,56 +37,38 @@ function parseRangeString(str : string) : [Range, Range] {
   return ranges as [Range, Range];
 }
 
-describe('ranges: overlaps(test, target)', () => {
+/* eslint-disable no-multi-spaces */
+describe('ranges: overlaps(A, X) returns', () => {
   it.each([
-    [false, '▀▀ ▄▄'],
-
-    [false, '▀▀▄▄'],
-
-    [true,  '▀█▄'],
-
-    [true,  '██'],
-
-    [true,  '▄█▀'],
-
-    [false, '▄▄▀▀'],
-
-    [false, '▄▄ ▀▀'],
-
-    [true, '▄██▄'],
-
-    [true, '▀██▀'],
-  ])('returns %p for %s', (expected, str) => {
+    [false, 'ᴬₓ▀▀ ▄▄'],
+    [false, 'ᴬₓ▀▀▄▄'],
+    [false, 'ᴬₓ▄▄▀▀'],
+    [false, 'ᴬₓ▄▄ ▀▀'],
+    [true,  'ᴬₓ▀█▄'],
+    [true,  'ᴬₓ██'],
+    [true,  'ᴬₓ▄█▀'],
+    [true,  'ᴬₓ▄██▄'],
+    [true,  'ᴬₓ▀██▀'],
+  ])('%p for %s', (expected, str) => {
     expect(overlaps(...parseRangeString(str))).toBe(expected);
   });
 });
 
-describe('ranges: isContainedIn(test, target)', () => {
+describe('ranges: isContainedIn(A, X) returns', () => {
   it.each([
-    [false, '▀▀ ▄▄'],
-
-    [false, '▀▀▄▄'],
-
-    [false, '▀█▄'],
-
-    [true,  '██'],
-
-    [true,  '██▄'],
-
-    [true,  '▄██'],
-
-    [false, '▄▄█▀'],
-
-    [false, '▄█▀'],
-
-    [false, '▄▄▀▀'],
-
-    [false, '▄▄ ▀▀'],
-
-    [true, '▄██▄'],
-
-    [false, '▀██▀'],
-  ])('returns %p for %s', (expected, str) => {
+    [false, 'ᴬₓ▀▀ ▄▄'],
+    [false, 'ᴬₓ▀▀▄▄'],
+    [false, 'ᴬₓ▀█▄'],
+    [false, 'ᴬₓ▄▄█▀'],
+    [false, 'ᴬₓ▄█▀'],
+    [false, 'ᴬₓ▄▄▀▀'],
+    [false, 'ᴬₓ▄▄ ▀▀'],
+    [false, 'ᴬₓ▀██▀'],
+    [true,  'ᴬₓ██▄'],
+    [true,  'ᴬₓ██'],
+    [true,  'ᴬₓ▄██'],
+    [true,  'ᴬₓ▄██▄'],
+  ])('%p for %s', (expected, str) => {
     expect(isContainedIn(...parseRangeString(str))).toBe(expected);
   });
 });

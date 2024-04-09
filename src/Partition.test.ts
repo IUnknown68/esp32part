@@ -6,7 +6,12 @@ import {
   PartitionType,
   PartitionSubTypeApp,
   PartitionSubTypeData,
+  PartitionFlags,
 } from './constants';
+
+import {
+  PartitionRecord,
+} from './csv';
 
 import Partition from './Partition';
 
@@ -109,6 +114,25 @@ describe("Partition's", () => {
   it('readonly flag can be reset', () => {
     testee.readonly = true;
     testee.readonly = false;
+    expect(testee.readonly).toBeFalse();
+  });
+
+  it('assign sets all data from a PartitionRecord as is', () => {
+    const record : PartitionRecord = {
+      name: 'foo',
+      type: PartitionType.data,
+      subType: PartitionSubTypeData.nvs_keys,
+      offset: 123,
+      size: 234,
+      flags: [PartitionFlags.encrypted],
+    };
+    testee.assign(record);
+    expect(testee.name).toBe(record.name);
+    expect(testee.type).toBe(record.type);
+    expect(testee.subType).toBe(record.subType);
+    expect(testee.offset).toBe(record.offset);
+    expect(testee.size).toBe(record.size);
+    expect(testee.encrypted).toBeTrue();
     expect(testee.readonly).toBeFalse();
   });
 });
