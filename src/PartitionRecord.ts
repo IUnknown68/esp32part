@@ -1,3 +1,10 @@
+import {
+  PartitionType,
+  PartitionSubTypeApp,
+  PartitionSubTypeData,
+  PartitionFlags,
+} from './constants';
+
 //------------------------------------------------------------------------------
 interface PartitionRecord {
   name: string;
@@ -6,7 +13,7 @@ interface PartitionRecord {
   offset: number;
   size: number;
   flags: Array<PartitionFlags>;
-  autoOffset: boolean,
+  lock: boolean,
 }
 
 //------------------------------------------------------------------------------

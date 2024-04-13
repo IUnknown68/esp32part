@@ -26,7 +26,7 @@ class Partition {
       offset: 0,
       size: DEFAULT_PARTITION_SIZE,
       flags: [],
-      autoOffset: false,
+      lock: false,
     };
     this.name = name;
   }

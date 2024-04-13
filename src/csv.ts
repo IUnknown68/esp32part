@@ -113,7 +113,7 @@ export function csvRowToPartition(line : string) : PartitionRecord | null {
     offset,
     size,
     flags,
-    autoOffset: !offset,
+    lock: false,
   };
 }
 

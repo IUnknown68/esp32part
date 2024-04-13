@@ -18,6 +18,16 @@ import {
   csvToPartitionList,
 } from './csv';
 
+import {
+  VALID_ROW,
+  VALID_ROW_RESULT,
+  VALID_ROW_NO_FLAGS,
+  VALID_ROW_RESULT_NO_FLAGS,
+  VALID_ROW_NO_FLAGS_NO_OFFSET,
+  VALID_ROW_RESULT_NO_FLAGS_NO_OFFSET,
+  CSV_AR,
+} from './testdata';
+
 enum SampleEnum {
   Zero = 0x00,
   One = 0x01,
@@ -154,71 +164,28 @@ describe('csvRowToPartition', () => {
 
   describe('returns a PartitionRecord, when', () => {
     it('the row contains all valid data', () => {
-      const VALID_ROW = 'nvs,      data, nvs,     0x9000,  0x5000, encrypted:readonly';
-      const VALID_ROW_RESULT = [
-        ['name', 'nvs'],
-        ['type', PartitionType.data],
-        ['subType', PartitionSubTypeData.nvs],
-        ['offset', 0x9000],
-        ['size', 0x5000],
-        ['autoOffset', false],
-        ['flags', [1, 2]],
-      ];
-
       const result = csvRowToPartition(VALID_ROW);
       expect(result).toContainAllEntries(VALID_ROW_RESULT);
     });
     it('the row contains valid data, but no flags', () => {
-      const VALID_ROW_WO_FLAGS = 'nvs,      data, nvs,     0x9000,  0x5000, ';
-      const VALID_ROW_RESULT_WO_FLAGS = [
-        ['name', 'nvs'],
-        ['type', PartitionType.data],
-        ['subType', PartitionSubTypeData.nvs],
-        ['offset', 0x9000],
-        ['size', 0x5000],
-        ['autoOffset', false],
-        ['flags', []],
-      ];
-
-      const result = csvRowToPartition(VALID_ROW_WO_FLAGS);
-      expect(result).toContainAllEntries(VALID_ROW_RESULT_WO_FLAGS);
+      const result = csvRowToPartition(VALID_ROW_NO_FLAGS);
+      expect(result).toContainAllEntries(VALID_ROW_RESULT_NO_FLAGS);
     });
     it('the row contains valid data, but no offset', () => {
-      const VALID_ROW_WO_FLAGS = 'nvs,      data, nvs, ,  0x5000, ';
-      const VALID_ROW_RESULT_WO_FLAGS = [
-        ['name', 'nvs'],
-        ['type', PartitionType.data],
-        ['subType', PartitionSubTypeData.nvs],
-        ['offset', 0],
-        ['size', 0x5000],
-        ['autoOffset', true],
-        ['flags', []],
-      ];
-
-      const result = csvRowToPartition(VALID_ROW_WO_FLAGS);
-      expect(result).toContainAllEntries(VALID_ROW_RESULT_WO_FLAGS);
+      const result = csvRowToPartition(VALID_ROW_NO_FLAGS_NO_OFFSET);
+      expect(result).toContainAllEntries(VALID_ROW_RESULT_NO_FLAGS_NO_OFFSET);
     });
   });
 });
 
 describe('csvToPartitionList', () => {
-  const CSV = [
-    '# Name,   Type, SubType, Offset,  Size, Flags',
-    'nvs,      data, nvs,     0x9000,  0x5000,',
-    'otadata,  data, ota,     0xe000,  0x2000,encrypted',
-    'app0,     app,  ota_0,   0x10000, 0x140000,encrypted:readonly',
-    'app1,     app,  ota_1,   0x150000,0x140000,readonly',
-    'spiffs,   data, spiffs,  0x290000,0x160000,',
-    'coredump, data, coredump,0x3F0000,0x10000,',
-  ];
-
   describe('parses all rows, when', () => {
     it('rows are separated by \\n', () => {
-      const result = csvToPartitionList(CSV.join('\n'));
+      const result = csvToPartitionList(CSV_AR.join('\n'));
       expect(result).toBeArrayOfSize(6);
     });
     it('rows are separated by \\r\\n', () => {
-      const result = csvToPartitionList(CSV.join('\r\n'));
+      const result = csvToPartitionList(CSV_AR.join('\r\n'));
       expect(result).toBeArrayOfSize(6);
     });
   });
