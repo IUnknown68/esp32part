@@ -5,17 +5,10 @@ import {
   PartitionFlags,
 } from './constants';
 
+import PartitionRecord from './PartitionRecord';
+
 const EXPECTED_COLUMNS = 6;
 const NUMBER_REGEX = /(0x)?([a-f0-9]+)([a-z]?)/i;
-
-export interface PartitionRecord {
-  name: string;
-  type: PartitionType | number;
-  subType: PartitionSubTypeApp | PartitionSubTypeData;
-  offset: number;
-  size: number;
-  flags: Array<PartitionFlags>;
-}
 
 //------------------------------------------------------------------------------
 export function parseEnum<T>(
@@ -96,6 +89,11 @@ export function csvRowToPartition(line : string) : PartitionRecord | null {
     throw new Error(`Invalid csv row: Expected ${EXPECTED_COLUMNS} columns.`);
   }
 
+  const size = parseNumber(data[4]);
+  if (!size) {
+    throw new RangeError('Size must not be 0.');
+  }
+
   const type = parseType(data[1]);
   const subType = (type === PartitionType.app)
     ? parseSubtypeApp(data[2])
@@ -105,14 +103,17 @@ export function csvRowToPartition(line : string) : PartitionRecord | null {
     ? data[5].split(/:/).map(parseFlag)
     : [];
 
+  // offset can be 0, PartitionManager will set it.
+  const offset = data[3] ? parseNumber(data[3]) : 0;
+
   return {
     name: data[0],
     type,
     subType,
-    // offset can be 0, PartitionTable will set it.
-    offset: data[3] ? parseNumber(data[3]) : 0,
-    size: parseNumber(data[4]),
+    offset,
+    size,
     flags,
+    autoOffset: !offset,
   };
 }
 

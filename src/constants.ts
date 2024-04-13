@@ -1,24 +1,26 @@
-export const MIN_FLASHSIZE_MB = 2;
-export const MAX_FLASHSIZE_MB = 32;
+export const MIN_FLASHSIZE_MIB = 2;
+export const MAX_FLASHSIZE_MIB = 32;
 
 export const MAX_NAME_LEN = 15;
 
+export const OFFSET_PART_TABLE = 0x8000;
 export const MAX_PARTITION_TABLE_LENGTH = 0xC00;
+export const DEFAULT_PARTITION_SIZE = 0x1000;
+export const PARTITION_TABLE_SIZE = 0x1000;
 // export const MD5_PARTITION_BEGIN = b'\xEB\xEB' + b'\xFF' * 14
-export const MIN_PARTITION_SIZE = 0x1000;
 
 export const BLOCK_ALIGNMENT_DATA = 0x1000;
 export const BLOCK_ALIGNMENT_APP = 0x10000;
 
-export enum PartitionSize {
-  S1Mb = 1 * 1024 * 1024,
-  S2Mb = 2 * 1024 * 1024,
-  S4Mb = 4 * 1024 * 1024,
-  S8Mb = 8 * 1024 * 1024,
-  S16Mb = 16 * 1024 * 1024,
-  S32Mb = 32 * 1024 * 1024,
-  S64Mb = 64 * 1024 * 1024,
-  S128Mb = 128 * 1024 * 1024,
+export enum FlashSize {
+  MiB1 = 1 * 1024 * 1024,
+  MiB2 = 2 * 1024 * 1024,
+  MiB4 = 4 * 1024 * 1024,
+  MiB8 = 8 * 1024 * 1024,
+  MiB16 = 16 * 1024 * 1024,
+  MiB32 = 32 * 1024 * 1024,
+  MiB64 = 64 * 1024 * 1024,
+  MiB128 = 128 * 1024 * 1024,
 }
 
 export enum PartitionType {

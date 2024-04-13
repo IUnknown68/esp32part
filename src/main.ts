@@ -1,8 +1,12 @@
-import PartitionTable from './PartitionTable';
+// TODO!!!
+import PartitionManager from './PartitionManager';
+import PartitionRecord from './PartitionRecord';
 
 export * from './constants';
 export * from './csv';
+export * from './PartitionRecord';
 
 export {
-  PartitionTable,
+  PartitionManager,
+  PartitionRecord,
 };

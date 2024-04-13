@@ -145,6 +145,11 @@ describe('csvRowToPartition', () => {
         csvRowToPartition('foo');
       }).toThrow();
     });
+    it('a row a size of 0', () => {
+      expect(() => {
+        csvRowToPartition('nvs,data,nvs,0x9000,0,encrypted:readonly');
+      }).toThrow();
+    });
   });
 
   describe('returns a PartitionRecord, when', () => {
@@ -156,6 +161,7 @@ describe('csvRowToPartition', () => {
         ['subType', PartitionSubTypeData.nvs],
         ['offset', 0x9000],
         ['size', 0x5000],
+        ['autoOffset', false],
         ['flags', [1, 2]],
       ];
 
@@ -170,6 +176,7 @@ describe('csvRowToPartition', () => {
         ['subType', PartitionSubTypeData.nvs],
         ['offset', 0x9000],
         ['size', 0x5000],
+        ['autoOffset', false],
         ['flags', []],
       ];
 
@@ -184,6 +191,7 @@ describe('csvRowToPartition', () => {
         ['subType', PartitionSubTypeData.nvs],
         ['offset', 0],
         ['size', 0x5000],
+        ['autoOffset', true],
         ['flags', []],
       ];
 

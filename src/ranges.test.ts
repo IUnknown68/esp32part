@@ -6,9 +6,8 @@ import {
 
 function minIndex(a : number, b : number) : number {
   if (a === -1 && b === -1) {
-    throw new Error('Missing rangeStart');
+    throw new Error('No rangetoken found');
   }
-  // Oh c'mon!
   // eslint-disable-next-line no-nested-ternary
   return (b === -1)
     ? a
@@ -40,35 +39,35 @@ function parseRangeString(str : string) : [Range, Range] {
 /* eslint-disable no-multi-spaces */
 describe('ranges: overlaps(A, X) returns', () => {
   it.each([
-    [false, 'ᴬₓ▀▀ ▄▄'],
-    [false, 'ᴬₓ▀▀▄▄'],
-    [false, 'ᴬₓ▄▄▀▀'],
-    [false, 'ᴬₓ▄▄ ▀▀'],
-    [true,  'ᴬₓ▀█▄'],
-    [true,  'ᴬₓ██'],
-    [true,  'ᴬₓ▄█▀'],
-    [true,  'ᴬₓ▄██▄'],
-    [true,  'ᴬₓ▀██▀'],
-  ])('%p for %s', (expected, str) => {
+    [false, 'ᴬₓ ▀▀ ▄▄'],
+    [false, 'ᴬₓ ▀▀▄▄'],
+    [false, 'ᴬₓ ▄▄▀▀'],
+    [false, 'ᴬₓ ▄▄ ▀▀'],
+    [true, ' ᴬₓ ▀█▄'],
+    [true, ' ᴬₓ ██'],
+    [true, ' ᴬₓ ▄█▀'],
+    [true, ' ᴬₓ ▄██▄'],
+    [true, ' ᴬₓ ▀██▀'],
+  ])('%p: %s', (expected, str) => {
     expect(overlaps(...parseRangeString(str))).toBe(expected);
   });
 });
 
 describe('ranges: isContainedIn(A, X) returns', () => {
   it.each([
-    [false, 'ᴬₓ▀▀ ▄▄'],
-    [false, 'ᴬₓ▀▀▄▄'],
-    [false, 'ᴬₓ▀█▄'],
-    [false, 'ᴬₓ▄▄█▀'],
-    [false, 'ᴬₓ▄█▀'],
-    [false, 'ᴬₓ▄▄▀▀'],
-    [false, 'ᴬₓ▄▄ ▀▀'],
-    [false, 'ᴬₓ▀██▀'],
-    [true,  'ᴬₓ██▄'],
-    [true,  'ᴬₓ██'],
-    [true,  'ᴬₓ▄██'],
-    [true,  'ᴬₓ▄██▄'],
-  ])('%p for %s', (expected, str) => {
+    [false, 'ᴬₓ ▀▀ ▄▄'],
+    [false, 'ᴬₓ ▀▀▄▄'],
+    [false, 'ᴬₓ ▀█▄'],
+    [false, 'ᴬₓ ▄▄█▀'],
+    [false, 'ᴬₓ ▄█▀'],
+    [false, 'ᴬₓ ▄▄▀▀'],
+    [false, 'ᴬₓ ▄▄ ▀▀'],
+    [false, 'ᴬₓ ▀██▀'],
+    [true, ' ᴬₓ ██▄'],
+    [true, ' ᴬₓ ██'],
+    [true, ' ᴬₓ ▄██'],
+    [true, ' ᴬₓ ▄██▄'],
+  ])('%p: %s', (expected, str) => {
     expect(isContainedIn(...parseRangeString(str))).toBe(expected);
   });
 });

@@ -1,15 +1,13 @@
 import {
   MAX_NAME_LEN,
-  MIN_PARTITION_SIZE,
+  DEFAULT_PARTITION_SIZE,
   PartitionType,
   PartitionSubType,
   PartitionSubTypeApp,
   PartitionFlags,
 } from './constants';
 
-import {
-  PartitionRecord,
-} from './csv';
+import PartitionRecord from './PartitionRecord';
 
 import {
   isValidType,
@@ -26,8 +24,9 @@ class Partition {
       type: PartitionType.app,
       subType: PartitionSubTypeApp.factory,
       offset: 0,
-      size: MIN_PARTITION_SIZE,
+      size: DEFAULT_PARTITION_SIZE,
       flags: [],
+      autoOffset: false,
     };
     this.name = name;
   }

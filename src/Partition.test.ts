@@ -2,7 +2,7 @@ import 'jest-extended';
 
 import {
   MAX_NAME_LEN,
-  MIN_PARTITION_SIZE,
+  DEFAULT_PARTITION_SIZE,
   PartitionType,
   PartitionSubTypeApp,
   PartitionSubTypeData,
@@ -29,7 +29,7 @@ describe("Partition's", () => {
     expect(testee.type).toBe(PartitionType.app);
     expect(testee.subType).toBe(PartitionSubTypeApp.factory);
     expect(testee.offset).toBe(0);
-    expect(testee.size).toBe(MIN_PARTITION_SIZE);
+    expect(testee.size).toBe(DEFAULT_PARTITION_SIZE);
     expect(testee.readonly).toBeFalse();
     expect(testee.encrypted).toBeFalse();
   });
