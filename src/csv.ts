@@ -106,6 +106,8 @@ export function parseNumber(value: string) : number {
 /**
  * Parses a single csv-row into a `PartitionRecord`. If the line is not a partition
  * (like a comment), returns `null`.
+ * Also validates the partition record in respect of its independent values (like
+ * name, relation of type / subtype etc).
  * @param  {string}          line CSV-String
  * @return {PartitionRecord}      Parsed record. `null` for empty lines or comments.
  * @throws {Error}
@@ -146,7 +148,7 @@ export function csvRowToPartition(line : string) : PartitionRecord | null {
   const offset = data[3] ? parseNumber(data[3]) : 0;
 
   return {
-    name: data[0],
+    name: data[0].slice(0, 15),
     type,
     subType,
     offset,

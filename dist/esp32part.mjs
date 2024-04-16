@@ -67,7 +67,14 @@ var PartitionFlags;
 
 const EXPECTED_COLUMNS = 6;
 const NUMBER_REGEX = /(0x)?([a-f0-9]+)([a-z]?)/i;
-//------------------------------------------------------------------------------
+/**
+ * Typesafe parsing of a number into an enum.
+ * @type {string}          T        Enum type.
+ * @param  {string}        value    String value to parse.
+ * @param  {Object}        enumType The enum type as an Object.
+ * @return {T}                      A valid enum of type `T`.
+ * @throws {TypeError}              If the value can not be parsed as `T`.
+ */
 function parseEnum(value, enumType) {
     try {
         return parseNumber(value.toString());
@@ -80,23 +87,49 @@ function parseEnum(value, enumType) {
         return Object.values(enumType)[index];
     }
 }
-//------------------------------------------------------------------------------
+/**
+ * Enum parser for `PartitionType`
+ * @param  {string}        value   String value to parse.
+ * @return {PartitionType}         A valid enum of type `PartitionType`.
+ * @throws {TypeError}             If the value can not be parsed as `PartitionType`.
+ */
 function parseType(value) {
     return parseEnum(value, PartitionType);
 }
-//------------------------------------------------------------------------------
+/**
+ * Enum parser for `PartitionSubTypeApp`
+ * @param  {string}        value   String value to parse.
+ * @return {PartitionSubTypeApp}   A valid enum of type `PartitionSubTypeApp`.
+ * @throws {TypeError}             If the value can not be parsed as `PartitionSubTypeApp`.
+ */
 function parseSubtypeApp(value) {
     return parseEnum(value, PartitionSubTypeApp);
 }
-//------------------------------------------------------------------------------
+/**
+ * Enum parser for `PartitionSubTypeData`
+ * @param  {string}        value   String value to parse.
+ * @return {PartitionSubTypeData}  A valid enum of type `PartitionSubTypeData`.
+ * @throws {TypeError}             If the value can not be parsed as `PartitionSubTypeData`.
+ */
 function parseSubtypeData(value) {
     return parseEnum(value, PartitionSubTypeData);
 }
-//------------------------------------------------------------------------------
+/**
+ * Enum parser for `parseFlag`
+ * @param  {string}        value   String value to parse.
+ * @return {parseFlag}             A valid enum of type `parseFlag`.
+ * @throws {TypeError}             If the value can not be parsed as `parseFlag`.
+ */
 function parseFlag(value) {
     return parseEnum(value, PartitionFlags);
 }
-//------------------------------------------------------------------------------
+/**
+ * Parses a number as it can appear in a partition table csv. Takes into account
+ * suffixes (K, M) and the prefix `0x` for hex numbers.
+ * @param  {string} value Value to parse.
+ * @return {number}       Parsed number.
+ * @throws {TypeError}
+ */
 function parseNumber(value) {
     const m = NUMBER_REGEX.exec(value);
     if (!m) {
@@ -119,7 +152,13 @@ function parseNumber(value) {
             throw new TypeError('Parse number: Invalid suffix.');
     }
 }
-//------------------------------------------------------------------------------
+/**
+ * Parses a single csv-row into a `PartitionRecord`. If the line is not a partition
+ * (like a comment), returns `null`.
+ * @param  {string}          line CSV-String
+ * @return {PartitionRecord}      Parsed record. `null` for empty lines or comments.
+ * @throws {Error}
+ */
 function csvRowToPartition(line) {
     const trimmed = line.trim();
     if (trimmed[0] === '#') {
@@ -158,7 +197,12 @@ function csvRowToPartition(line) {
         lock: false,
     };
 }
-//------------------------------------------------------------------------------
+/**
+ * Parses a csv-file into an `Array` of `PartitionRecord`s.
+ * @param  {string}          line CSV
+ * @return {Array<PartitionRecord>}      Parsed records.
+ * @throws {Error}
+ */
 function csvToPartitionList(value) {
     return value.split(/\r?\n/)
         .map(csvRowToPartition)

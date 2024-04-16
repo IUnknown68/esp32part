@@ -1,9 +1,52 @@
 import {
+  PARTITION_TABLE_SIZE,
+  OFFSET_PART_TABLE,
   PartitionType,
   PartitionSubType,
   PartitionSubTypeApp,
   PartitionSubTypeData,
 } from './constants';
+
+import {
+  getOffsetAlignment,
+} from './tools';
+
+//------------------------------------------------------------------------------
+export function validatePartition(
+  record : PartitionRecord,
+  offsetMin : number = 0,
+) : number {
+  if (record.offset && record.offset < offsetMin) {
+    throw new RangeError('Partition overlaps.');
+  }
+
+  if (!record.offset) {
+    const padTo = getOffsetAlignment(record.type);
+    const rest = offsetMin % padTo;
+    // eslint-disable-next-line no-param-reassign
+    record.offset = (rest)
+      ? offsetMin + padTo - rest
+      : offsetMin;
+  }
+  if (record.size <= 0) {
+    // Since negative sizes are undocumented, exclude it here for now.
+    throw new RangeError('Negative sizes are not supported.');
+    // record.size = -record.size - record.offset;
+  }
+
+  return record.offset + record.size;
+}
+
+//------------------------------------------------------------------------------
+export function validatePartitionTable(
+  table : PartitionTable,
+  offsetPartitionTable : number = OFFSET_PART_TABLE,
+) : number {
+  return table.reduce(
+    (tableEnd, record) => validatePartition(record, tableEnd),
+    offsetPartitionTable + PARTITION_TABLE_SIZE,
+  );
+}
 
 //------------------------------------------------------------------------------
 export function isValidType(type : PartitionType | number) : boolean {
@@ -24,38 +67,3 @@ export function isValidSubType(
       return (Number.isInteger(subType) && subType >= 0 && subType <= 0xfe);
   }
 }
-
-/*
-import {
-  AlignmentError,
-} from 'src/lib/errors.js';
-
-import {
-  BLOCK_ALIGNMENT_DATA,
-  BLOCK_ALIGNMENT_APP,
-  PARTITION_TYPE,
-} from 'src/constants.js';
-
-//------------------------------------------------------------------------------
-export function assertValidPartitionOffset(partitionTable, type, offset) {
-  if (typeof offset !== 'number') {
-    return new TypeError('Offset must be a number.');
-  }
-  if ((type === PARTITION_TYPE.app) && (offset % BLOCK_ALIGNMENT_APP)) {
-    return new AlignmentError(`App-partition must be a aligned to ${BLOCK_ALIGNMENT_APP}.`);
-  }
-  if ((type === PARTITION_TYPE.data) && (offset % BLOCK_ALIGNMENT_DATA)) {
-    return new AlignmentError(`Data-partition must be a aligned to ${BLOCK_ALIGNMENT_DATA}.`);
-  }
-}
-
-//------------------------------------------------------------------------------
-export function assertValidPartitionSize(partitionTable, offset, size) {
-  if (typeof offset !== 'number') {
-    return new TypeError('Size must be a number.');
-  }
-  if ((offset + size) >= partitionTable.flashSize) {
-    return new TypeError('Partition extends past end of flash.');
-  }
-}
-*/

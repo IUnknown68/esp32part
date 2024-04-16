@@ -1,7 +1,7 @@
 {
   "source": {
     "include": [
-      "src"
+      "dist"
     ]
   },
   "sourceType": "module",

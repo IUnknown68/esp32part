@@ -72,13 +72,65 @@ interface PartitionRecord {
 type PartitionTable = Array<PartitionRecord>;
 declare function clonePartitionRecord(record: PartitionRecord): PartitionRecord;
 
+/**
+ * Typesafe parsing of a number into an enum.
+ * @type {string}          T        Enum type.
+ * @param  {string}        value    String value to parse.
+ * @param  {Object}        enumType The enum type as an Object.
+ * @return {T}                      A valid enum of type `T`.
+ * @throws {TypeError}              If the value can not be parsed as `T`.
+ */
 declare function parseEnum<T>(value: string, enumType: Record<string, string | number>): T;
+/**
+ * Enum parser for `PartitionType`
+ * @param  {string}        value   String value to parse.
+ * @return {PartitionType}         A valid enum of type `PartitionType`.
+ * @throws {TypeError}             If the value can not be parsed as `PartitionType`.
+ */
 declare function parseType(value: string): PartitionType;
+/**
+ * Enum parser for `PartitionSubTypeApp`
+ * @param  {string}        value   String value to parse.
+ * @return {PartitionSubTypeApp}   A valid enum of type `PartitionSubTypeApp`.
+ * @throws {TypeError}             If the value can not be parsed as `PartitionSubTypeApp`.
+ */
 declare function parseSubtypeApp(value: string): PartitionSubTypeApp;
+/**
+ * Enum parser for `PartitionSubTypeData`
+ * @param  {string}        value   String value to parse.
+ * @return {PartitionSubTypeData}  A valid enum of type `PartitionSubTypeData`.
+ * @throws {TypeError}             If the value can not be parsed as `PartitionSubTypeData`.
+ */
 declare function parseSubtypeData(value: string): PartitionSubTypeData;
+/**
+ * Enum parser for `parseFlag`
+ * @param  {string}        value   String value to parse.
+ * @return {parseFlag}             A valid enum of type `parseFlag`.
+ * @throws {TypeError}             If the value can not be parsed as `parseFlag`.
+ */
 declare function parseFlag(value: string): PartitionFlags;
+/**
+ * Parses a number as it can appear in a partition table csv. Takes into account
+ * suffixes (K, M) and the prefix `0x` for hex numbers.
+ * @param  {string} value Value to parse.
+ * @return {number}       Parsed number.
+ * @throws {TypeError}
+ */
 declare function parseNumber(value: string): number;
+/**
+ * Parses a single csv-row into a `PartitionRecord`. If the line is not a partition
+ * (like a comment), returns `null`.
+ * @param  {string}          line CSV-String
+ * @return {PartitionRecord}      Parsed record. `null` for empty lines or comments.
+ * @throws {Error}
+ */
 declare function csvRowToPartition(line: string): PartitionRecord | null;
+/**
+ * Parses a csv-file into an `Array` of `PartitionRecord`s.
+ * @param  {string}          line CSV
+ * @return {Array<PartitionRecord>}      Parsed records.
+ * @throws {Error}
+ */
 declare function csvToPartitionList(value: string): any;
 
 declare class PartitionManager {
