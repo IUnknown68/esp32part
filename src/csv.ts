@@ -10,7 +10,14 @@ import PartitionRecord from './PartitionRecord';
 const EXPECTED_COLUMNS = 6;
 const NUMBER_REGEX = /(0x)?([a-f0-9]+)([a-z]?)/i;
 
-//------------------------------------------------------------------------------
+/**
+ * Typesafe parsing of a number into an enum.
+ * @type {string}          T        Enum type.
+ * @param  {string}        value    String value to parse.
+ * @param  {Object}        enumType The enum type as an Object.
+ * @return {T}                      A valid enum of type `T`.
+ * @throws {TypeError}              If the value can not be parsed as `T`.
+ */
 export function parseEnum<T>(
   value: string,
   enumType: Record<string, string | number>,
@@ -26,27 +33,53 @@ export function parseEnum<T>(
   }
 }
 
-//------------------------------------------------------------------------------
+/**
+ * Enum parser for `PartitionType`
+ * @param  {string}        value   String value to parse.
+ * @return {PartitionType}         A valid enum of type `PartitionType`.
+ * @throws {TypeError}             If the value can not be parsed as `PartitionType`.
+ */
 export function parseType(value: string) : PartitionType {
   return parseEnum(value, PartitionType);
 }
 
-//------------------------------------------------------------------------------
+/**
+ * Enum parser for `PartitionSubTypeApp`
+ * @param  {string}        value   String value to parse.
+ * @return {PartitionSubTypeApp}   A valid enum of type `PartitionSubTypeApp`.
+ * @throws {TypeError}             If the value can not be parsed as `PartitionSubTypeApp`.
+ */
 export function parseSubtypeApp(value: string) : PartitionSubTypeApp {
   return parseEnum(value, PartitionSubTypeApp);
 }
 
-//------------------------------------------------------------------------------
+/**
+ * Enum parser for `PartitionSubTypeData`
+ * @param  {string}        value   String value to parse.
+ * @return {PartitionSubTypeData}  A valid enum of type `PartitionSubTypeData`.
+ * @throws {TypeError}             If the value can not be parsed as `PartitionSubTypeData`.
+ */
 export function parseSubtypeData(value: string) : PartitionSubTypeData {
   return parseEnum(value, PartitionSubTypeData);
 }
 
-//------------------------------------------------------------------------------
+/**
+ * Enum parser for `parseFlag`
+ * @param  {string}        value   String value to parse.
+ * @return {parseFlag}             A valid enum of type `parseFlag`.
+ * @throws {TypeError}             If the value can not be parsed as `parseFlag`.
+ */
 export function parseFlag(value: string) : PartitionFlags {
   return parseEnum(value, PartitionFlags);
 }
 
-//------------------------------------------------------------------------------
+/**
+ * Parses a number as it can appear in a partition table csv. Takes into account
+ * suffixes (K, M) and the prefix `0x` for hex numbers.
+ * @param  {string} value Value to parse.
+ * @return {number}       Parsed number.
+ * @throws {TypeError}
+ */
 export function parseNumber(value: string) : number {
   const m = NUMBER_REGEX.exec(value);
   if (!m) {
@@ -70,7 +103,13 @@ export function parseNumber(value: string) : number {
   }
 }
 
-//------------------------------------------------------------------------------
+/**
+ * Parses a single csv-row into a `PartitionRecord`. If the line is not a partition
+ * (like a comment), returns `null`.
+ * @param  {string}          line CSV-String
+ * @return {PartitionRecord}      Parsed record. `null` for empty lines or comments.
+ * @throws {Error}
+ */
 export function csvRowToPartition(line : string) : PartitionRecord | null {
   const trimmed = line.trim();
   if (trimmed[0] === '#') {
@@ -117,7 +156,12 @@ export function csvRowToPartition(line : string) : PartitionRecord | null {
   };
 }
 
-//------------------------------------------------------------------------------
+/**
+ * Parses a csv-file into an `Array` of `PartitionRecord`s.
+ * @param  {string}          line CSV
+ * @return {Array<PartitionRecord>}      Parsed records.
+ * @throws {Error}
+ */
 export function csvToPartitionList(value : string) : any {
   return value.split(/\r?\n/)
     .map(csvRowToPartition)

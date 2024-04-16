@@ -148,15 +148,16 @@ function csvRowToPartition(line) {
     const flags = data[5]
         ? data[5].split(/:/).map(parseFlag)
         : [];
+    // offset can be 0, PartitionManager will set it.
+    const offset = data[3] ? parseNumber(data[3]) : 0;
     return {
         name: data[0],
         type,
         subType,
-        // offset can be 0, PartitionTable will set it.
-        offset: data[3] ? parseNumber(data[3]) : 0,
+        offset,
         size,
         flags,
-        autoOffset: true,
+        lock: false,
     };
 }
 //------------------------------------------------------------------------------
@@ -166,26 +167,31 @@ function csvToPartitionList(value) {
         .filter((line) => !!line);
 }
 
+//------------------------------------------------------------------------------
+function clonePartitionRecord(record) {
+    return Object.assign(Object.assign({}, record), { flags: [...record.flags] });
+}
+
 const { MiB128 } = exports.FlashSize;
-class PartitionTable {
+//------------------------------------------------------------------------------
+class PartitionManager {
     static fromCsv(csv, maxSize = MiB128) {
-        return new PartitionTable(csvToPartitionList(csv), maxSize);
+        return new PartitionManager(csvToPartitionList(csv), maxSize);
     }
-    static getOffsetAlignment(type) {
-        return (type === exports.PartitionType.app)
-            ? BLOCK_ALIGNMENT_DATA
-            : BLOCK_ALIGNMENT_APP;
-    }
-    constructor(partitionRecords = [], maxSize = MiB128) {
+    constructor(table = [], maxSize = MiB128) {
         this.maxSize = maxSize;
-        this.table = [];
-        for (const record of partitionRecords) {
-            this.addPartition(record);
+        const tableEnd = validatePartitionTable([
+            ...table.map(clonePartitionRecord),
+        ]);
+        if (tableEnd > this.maxSize) {
+            // eslint-disable-next-line no-bitwise
+            throw new RangeError(`Overall size exceeds flash size (${this.maxSize >> 20} MiB).`);
         }
+        this.table = table;
     }
     addPartition(record, index = -1) {
         // TODO: Check for existing partition
-        const newTable = (index > -1)
+        const newTable = ((index > -1)
             ? [
                 ...this.table.slice(0, index),
                 record,
@@ -194,36 +200,44 @@ class PartitionTable {
             : [
                 ...this.table,
                 record,
-            ];
-        this.validatePartitionTable(newTable);
+            ]).map(clonePartitionRecord);
+        const tableEnd = validatePartitionTable(newTable);
+        if (tableEnd > this.maxSize) {
+            // eslint-disable-next-line no-bitwise
+            throw new RangeError(`Overall size exceeds flash size (${this.maxSize >> 20} MiB).`);
+        }
         this.table = newTable;
     }
-    validatePartitionTable(table, offsetPartitionTable = OFFSET_PART_TABLE) {
-        let tableEnd = offsetPartitionTable + PARTITION_TABLE_SIZE;
-        for (const [index, record] of table.entries()) {
-            if (!record.autoOffset && record.offset < tableEnd) {
-                throw new RangeError(`Partition ${index} overlaps.`);
-            }
-            if (record.autoOffset) {
-                const padTo = PartitionTable.getOffsetAlignment(record.type);
-                const rest = tableEnd % padTo;
-                if (rest) {
-                    tableEnd += padTo - rest;
-                }
-                record.offset = tableEnd;
-            }
-            if (record.size < 0) {
-                // Since negative sizes are undocumented, exclude it here for now.
-                throw new RangeError('Negative sizes are not supported.');
-                // record.size = -record.size - record.offset;
-            }
-            tableEnd = record.offset + record.size;
-            if (tableEnd > this.maxSize) {
-                // eslint-disable-next-line no-bitwise
-                throw new RangeError(`Overall size exceeds flash size (${this.maxSize >> 20} MiB).`);
-            }
-        }
+}
+//------------------------------------------------------------------------------
+function getOffsetAlignment(type) {
+    return (type === exports.PartitionType.app)
+        ? BLOCK_ALIGNMENT_APP
+        : BLOCK_ALIGNMENT_DATA;
+}
+//------------------------------------------------------------------------------
+function validatePartition(record, offsetMin = 0) {
+    if (record.offset && record.offset < offsetMin) {
+        throw new RangeError('Partition overlaps.');
     }
+    if (!record.offset) {
+        const padTo = getOffsetAlignment(record.type);
+        const rest = offsetMin % padTo;
+        // eslint-disable-next-line no-param-reassign
+        record.offset = (rest)
+            ? offsetMin + padTo - rest
+            : offsetMin;
+    }
+    if (record.size <= 0) {
+        // Since negative sizes are undocumented, exclude it here for now.
+        throw new RangeError('Negative sizes are not supported.');
+        // record.size = -record.size - record.offset;
+    }
+    return record.offset + record.size;
+}
+//------------------------------------------------------------------------------
+function validatePartitionTable(table, offsetPartitionTable = OFFSET_PART_TABLE) {
+    return table.reduce((tableEnd, record) => validatePartition(record, tableEnd), offsetPartitionTable + PARTITION_TABLE_SIZE);
 }
 
 exports.BLOCK_ALIGNMENT_APP = BLOCK_ALIGNMENT_APP;
@@ -235,13 +249,17 @@ exports.MAX_PARTITION_TABLE_LENGTH = MAX_PARTITION_TABLE_LENGTH;
 exports.MIN_FLASHSIZE_MIB = MIN_FLASHSIZE_MIB;
 exports.OFFSET_PART_TABLE = OFFSET_PART_TABLE;
 exports.PARTITION_TABLE_SIZE = PARTITION_TABLE_SIZE;
-exports.PartitionTable = PartitionTable;
+exports.PartitionManager = PartitionManager;
+exports.clonePartitionRecord = clonePartitionRecord;
 exports.csvRowToPartition = csvRowToPartition;
 exports.csvToPartitionList = csvToPartitionList;
+exports.getOffsetAlignment = getOffsetAlignment;
 exports.parseEnum = parseEnum;
 exports.parseFlag = parseFlag;
 exports.parseNumber = parseNumber;
 exports.parseSubtypeApp = parseSubtypeApp;
 exports.parseSubtypeData = parseSubtypeData;
 exports.parseType = parseType;
+exports.validatePartition = validatePartition;
+exports.validatePartitionTable = validatePartitionTable;
 //# sourceMappingURL=esp32part.js.map

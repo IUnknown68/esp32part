@@ -19,7 +19,7 @@ import PartitionRecord, {
 const { MiB128 } = FlashSize;
 
 //------------------------------------------------------------------------------
-class PartitionManager {
+export class PartitionManager {
   private table : PartitionTable;
 
   static fromCsv(csv: string, maxSize: FlashSize = MiB128)
@@ -68,32 +68,38 @@ export function getOffsetAlignment(type : PartitionType) {
 }
 
 //------------------------------------------------------------------------------
+export function validatePartition(
+  record : PartitionRecord,
+  offsetMin : number = 0,
+) : number {
+  if (record.offset && record.offset < offsetMin) {
+    throw new RangeError('Partition overlaps.');
+  }
+
+  if (!record.offset) {
+    const padTo = getOffsetAlignment(record.type);
+    const rest = offsetMin % padTo;
+    // eslint-disable-next-line no-param-reassign
+    record.offset = (rest)
+      ? offsetMin + padTo - rest
+      : offsetMin;
+  }
+  if (record.size <= 0) {
+    // Since negative sizes are undocumented, exclude it here for now.
+    throw new RangeError('Negative sizes are not supported.');
+    // record.size = -record.size - record.offset;
+  }
+
+  return record.offset + record.size;
+}
+
+//------------------------------------------------------------------------------
 export function validatePartitionTable(
   table : PartitionTable,
   offsetPartitionTable : number = OFFSET_PART_TABLE,
 ) : number {
-  let tableEnd = offsetPartitionTable + PARTITION_TABLE_SIZE;
-  for (const [index, record] of table.entries()) {
-    if (record.offset && record.offset < tableEnd) {
-      throw new RangeError(`Partition ${index} overlaps.`);
-    }
-
-    if (!record.offset) {
-      const padTo = getOffsetAlignment(record.type);
-      const rest = tableEnd % padTo;
-      if (rest) {
-        tableEnd += padTo - rest;
-      }
-      record.offset = tableEnd;
-    }
-    if (record.size <= 0) {
-      // Since negative sizes are undocumented, exclude it here for now.
-      throw new RangeError('Negative sizes are not supported.');
-      // record.size = -record.size - record.offset;
-    }
-    tableEnd = record.offset + record.size;
-  }
-  return tableEnd;
+  return table.reduce(
+    (tableEnd, record) => validatePartition(record, tableEnd),
+    offsetPartitionTable + PARTITION_TABLE_SIZE,
+  );
 }
-
-export default PartitionManager;

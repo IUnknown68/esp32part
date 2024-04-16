@@ -5,9 +5,7 @@ import {
   PartitionFlags,
 } from './constants';
 
-import {
-  PartitionRecord,
-} from './csv';
+import PartitionRecord from './PartitionRecord';
 
 export const SAMPLE_PARTITION_RECORD : PartitionRecord = {
   name: 'nvs',

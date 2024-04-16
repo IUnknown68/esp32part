@@ -67,8 +67,11 @@ interface PartitionRecord {
     offset: number;
     size: number;
     flags: Array<PartitionFlags>;
-    autoOffset: boolean;
+    lock: boolean;
 }
+type PartitionTable = Array<PartitionRecord>;
+declare function clonePartitionRecord(record: PartitionRecord): PartitionRecord;
+
 declare function parseEnum<T>(value: string, enumType: Record<string, string | number>): T;
 declare function parseType(value: string): PartitionType;
 declare function parseSubtypeApp(value: string): PartitionSubTypeApp;
@@ -78,15 +81,15 @@ declare function parseNumber(value: string): number;
 declare function csvRowToPartition(line: string): PartitionRecord | null;
 declare function csvToPartitionList(value: string): any;
 
-type PartitionRecordAr = Array<PartitionRecord>;
-declare class PartitionTable {
+declare class PartitionManager {
     maxSize: FlashSize;
     private table;
-    static fromCsv(csv: string, maxSize?: FlashSize): PartitionTable;
-    static getOffsetAlignment(type: PartitionType): 4096 | 65536;
-    constructor(partitionRecords?: PartitionRecordAr, maxSize?: FlashSize);
+    static fromCsv(csv: string, maxSize?: FlashSize): PartitionManager;
+    constructor(table?: PartitionTable, maxSize?: FlashSize);
     addPartition(record: PartitionRecord, index?: number): void;
-    validatePartitionTable(table: PartitionRecordAr, offsetPartitionTable?: number): void;
 }
+declare function getOffsetAlignment(type: PartitionType): 4096 | 65536;
+declare function validatePartition(record: PartitionRecord, offsetMin?: number): number;
+declare function validatePartitionTable(table: PartitionTable, offsetPartitionTable?: number): number;
 
-export { BLOCK_ALIGNMENT_APP, BLOCK_ALIGNMENT_DATA, DEFAULT_PARTITION_SIZE, FlashSize, MAX_FLASHSIZE_MIB, MAX_NAME_LEN, MAX_PARTITION_TABLE_LENGTH, MIN_FLASHSIZE_MIB, OFFSET_PART_TABLE, PARTITION_TABLE_SIZE, PartitionFlags, type PartitionRecord, type PartitionSubType, PartitionSubTypeApp, PartitionSubTypeData, PartitionTable, PartitionType, csvRowToPartition, csvToPartitionList, parseEnum, parseFlag, parseNumber, parseSubtypeApp, parseSubtypeData, parseType };
+export { BLOCK_ALIGNMENT_APP, BLOCK_ALIGNMENT_DATA, DEFAULT_PARTITION_SIZE, FlashSize, MAX_FLASHSIZE_MIB, MAX_NAME_LEN, MAX_PARTITION_TABLE_LENGTH, MIN_FLASHSIZE_MIB, OFFSET_PART_TABLE, PARTITION_TABLE_SIZE, PartitionFlags, PartitionManager, type PartitionSubType, PartitionSubTypeApp, PartitionSubTypeData, type PartitionTable, PartitionType, clonePartitionRecord, csvRowToPartition, csvToPartitionList, getOffsetAlignment, parseEnum, parseFlag, parseNumber, parseSubtypeApp, parseSubtypeData, parseType, validatePartition, validatePartitionTable };
