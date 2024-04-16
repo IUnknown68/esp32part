@@ -1,13 +1,10 @@
-export const MIN_FLASHSIZE_MIB = 2;
-export const MAX_FLASHSIZE_MIB = 32;
-
 export const MAX_NAME_LEN = 15;
 
 export const OFFSET_PART_TABLE = 0x8000;
-export const MAX_PARTITION_TABLE_LENGTH = 0xC00;
-export const DEFAULT_PARTITION_SIZE = 0x1000;
 export const PARTITION_TABLE_SIZE = 0x1000;
-// export const MD5_PARTITION_BEGIN = b'\xEB\xEB' + b'\xFF' * 14
+
+// export const MAX_PARTITION_TABLE_LENGTH = 0xC00;
+// export const DEFAULT_PARTITION_SIZE = 0x1000;
 
 export const BLOCK_ALIGNMENT_DATA = 0x1000;
 export const BLOCK_ALIGNMENT_APP = 0x10000;

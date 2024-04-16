@@ -11,7 +11,7 @@ import {
 import {
   isValidType,
   isValidSubType,
-  validatePartition,
+  validatePartitionPosition,
   validatePartitionTable,
 } from './validation';
 
@@ -91,13 +91,13 @@ describe('isValidSubType', () => {
   });
 });
 
-describe('validatePartition()', () => {
+describe('validatePartitionPosition()', () => {
   describe('throws an error, when', () => {
     it('a record overlaps with the offset', () => {
       const record = clonePartitionRecord(SAMPLE_PARTITION_RECORD);
       record.offset = -1;
       expect(() => {
-        validatePartition(record);
+        validatePartitionPosition(record);
       }).toThrow();
     });
 
@@ -105,7 +105,7 @@ describe('validatePartition()', () => {
       const record = clonePartitionRecord(SAMPLE_PARTITION_RECORD);
       record.offset = 1;
       expect(() => {
-        validatePartition(record, 2);
+        validatePartitionPosition(record, 2);
       }).toThrow();
     });
 
@@ -113,11 +113,11 @@ describe('validatePartition()', () => {
       const record = clonePartitionRecord(SAMPLE_PARTITION_RECORD);
       record.size = 0;
       expect(() => {
-        validatePartition(record);
+        validatePartitionPosition(record);
       }).toThrow();
       record.size = -1;
       expect(() => {
-        validatePartition(record);
+        validatePartitionPosition(record);
       }).toThrow();
     });
   });
@@ -127,7 +127,7 @@ describe('validatePartition()', () => {
       const record = clonePartitionRecord(SAMPLE_PARTITION_RECORD);
       record.offset = 0;
       expect(() => {
-        validatePartition(record);
+        validatePartitionPosition(record);
       }).not.toThrow();
     });
 
@@ -135,7 +135,7 @@ describe('validatePartition()', () => {
       const record = clonePartitionRecord(SAMPLE_PARTITION_RECORD);
       record.offset = 2;
       expect(() => {
-        validatePartition(record, 2);
+        validatePartitionPosition(record, 2);
       }).not.toThrow();
     });
   });
@@ -143,7 +143,7 @@ describe('validatePartition()', () => {
   it('returns the end of the table', () => {
     const record = clonePartitionRecord(SAMPLE_PARTITION_RECORD);
     record.offset = 0;
-    const result = validatePartition(record);
+    const result = validatePartitionPosition(record);
     expect(result).toBe(record.size);
   });
 });

@@ -4,7 +4,10 @@ import {
   PartitionType,
 } from './constants';
 
-//------------------------------------------------------------------------------
+/**
+ * Returns the proper alignment for a certain partition type.
+ * @param {PartitionType} type [description]
+ */
 // eslint-disable-next-line import/prefer-default-export
 export function getOffsetAlignment(type : PartitionType) {
   return (type === PartitionType.app)

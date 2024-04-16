@@ -1,4 +1,5 @@
 import {
+  MAX_NAME_LEN,
   PartitionType,
   PartitionSubTypeApp,
   PartitionSubTypeData,
@@ -11,7 +12,7 @@ const EXPECTED_COLUMNS = 6;
 const NUMBER_REGEX = /(0x)?([a-f0-9]+)([a-z]?)/i;
 
 /**
- * Typesafe parsing of a number into an enum.
+ * Parses either a string literal or a number into an enum.
  * @type {string}          T        Enum type.
  * @param  {string}        value    String value to parse.
  * @param  {Object}        enumType The enum type as an Object.
@@ -106,7 +107,7 @@ export function parseNumber(value: string) : number {
 /**
  * Parses a single csv-row into a `PartitionRecord`. If the line is not a partition
  * (like a comment), returns `null`.
- * Also validates the partition record in respect of its independent values (like
+ * Validates the partition record in respect of its independent values (like
  * name, relation of type / subtype etc).
  * @param  {string}          line CSV-String
  * @return {PartitionRecord}      Parsed record. `null` for empty lines or comments.
@@ -140,6 +141,8 @@ export function csvRowToPartition(line : string) : PartitionRecord | null {
     ? parseSubtypeApp(data[2])
     : parseSubtypeData(data[2]);
 
+  // TODO: validate type / subtype
+
   const flags = data[5]
     ? data[5].split(/:/).map(parseFlag)
     : [];
@@ -148,7 +151,7 @@ export function csvRowToPartition(line : string) : PartitionRecord | null {
   const offset = data[3] ? parseNumber(data[3]) : 0;
 
   return {
-    name: data[0].slice(0, 15),
+    name: data[0].slice(0, MAX_NAME_LEN),
     type,
     subType,
     offset,
